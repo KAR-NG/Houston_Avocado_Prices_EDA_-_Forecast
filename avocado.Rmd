@@ -1,0 +1,1313 @@
+---
+title: "Which city in the US has the cheapest Avocado?"
+author: "Kar Ng"
+date: "2021"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 4
+    toc_float: true
+  pdf_document:
+    toc: yes
+subtitle: Personal project
+---
+
+***  
+
+![Photo by Russell 2020](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\thumbnail1.png)
+
+***  
+
+```{r echo=FALSE}
+bytes <- file.size("avocado.Rmd")
+words <- bytes/10
+minutes <- words/200
+```
+
+Reading time: `r round(minutes)` minutes
+
+
+
+## 1 SUMMARY
+This is a personal side project using an avocado public data set introduced in the 6-month extensive Google Data Analytics Professional Certificate program. The goal of this project is to identify which city in the US has the cheapest avocado and is the price able to fit within a budget of $800 a year with a consumption rate of minimum 1 avocado per day. Another goal is to predict the trend of avocado prices, organic and non-organic, in the future 24 months and hopefully their prices in the chosen city remain budget-friendly. 
+
+Numerous graphs were created during EDA and prediction, include box plots, tree maps, bar charts, pie charts, different types of time plot (general, differences, sub-series), plots for ACF-Log, histograms for normality and forecasting graphs. Forecasting touches on seasonality and stationary tests using pp-test, wo-test, and autocorrrelation test using Ljung-Box test. There are 4 forecasting activities on predicting the price of non-organic and organic avocado prices in the US, as well as in the city of chosen in the next 24 months. 
+
+Results reveal that 97% of avocados in the US were sold as non-organic avocado, and 3% as organic. Most popular avocados are small and medium size (PLU4225). Picking Houston as the city of first preference to move to as the city is the second cheapest non-organic avocado city, the cheapest organic avocado city, and the top 10 most avocado-consuming cities. From my forecast, 95% of non-organic avocado prices in Houston will fall below my threshold of 2 dollars per avocado, but for organic avocado, 95% of chance that the price may exceed 2 dollars after 2019. Base on this data set and results, I will move to Houston, consume organic avocado until the end of 2019, then switch to non-organic ones. These conditions fulfilled my desire of at least 1 avocado per day and not exceeding threshold of $800 per year, and in the same time being environmental friendlier. 
+
+
+
+![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic4_combined.png)
+
+
+## 2 R PACKAGES
+
+R packages loaded in this projects include tidyverse packages (ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, and forcats), skimr, lubridate, kableExtra, ggrepel, hms, treemapify, fpp2, and seastests.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(skimr)
+library(lubridate)
+library(kableExtra)
+library(ggrepel)
+library(hms)
+library(treemapify)
+library(fpp2)
+library(seastests)
+
+
+```
+
+## 3 SCENARIO AND BUSINESS QUESTIONS
+
+In this scenario - (1) I am an avocado lover, (2) I must consume minimum of 1 avocado per day, and (3) I am migrating to US next year to experience US life. 
+
+
+![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic3_avocombine.JPG)
+
+
+I would like to move to a US city with cheap avocado. Despite I would like to eat as more as possible but I still have a budget of $800 per year allocated for avocado consumption. 
+
+In my plan, I would like find out the top-5 cities where avocados are the cheapest and hopefully the cheap price remains similar in the next 2 years after I move there. It will be great if I can contribute something for the environment by eating organic avocado. Of course, if the organic price is within my budget. 
+
+I hope this project can give me some insightful answers!
+
+
+
+
+## 4 Data PREPARATION
+
+Data set used in this personal project has an official name known as "Avocado Prices". The data set was introduced by the 6-month extensive Google Professional Data Analytics Certificate that I completed on 31 May 2021. This data set was used by the program in a few parts of its data analysis activities. 
+
+Instructed by the Google program, the data set was downloaded from *Kaggle*. Kaggle is a great website for data science community, [click this link to the page of the dataset](https://www.kaggle.com/neuromusic/avocado-prices). The data set was created and uploaded by Justin Kiggins onto Kaggle and the data was originally from the Hass Avocado Board website in May 2018, [click here to the Hass Avocado Board website](https://hassavocadoboard.com/). 
+
+
+### 4.1 Data import
+
+This section imports the "Avocado Price" data set into R with a given data set name called "avocado". Following table shows the first 10,000 rows of raw data within the data set.
+
+```{r, message = FALSE, warning = FALSE}
+
+avocado <- read_csv("avocado.csv")
+avocado
+
+
+```
+
+### 4.2 Data description
+
+The data set contains important information such as dates, avocado average prices, amounts sold, 3 PLU codes of avocados, type of the produce and associated region. Check out following table for these details. The information in the description column are from *Kaggle*. 
+
+```{r, message=FALSE, warning=FALSE, fig.cap= "Table 4.2. variable and respective description"}
+
+Variable <- c("X1",
+              "Date",
+              "AveragePrice",
+              "Total Volume",
+              "4046",
+              "4225",
+              "4770",
+              "Total Bags",
+              "Small Bags",
+              "Large Bags",
+              "XLarge Bags",
+              "type",
+              "year",
+              "region")
+
+Description <- c("Index",
+                 "The date of the observation",
+                 "The average price of a single avocado, even when multiple avocados are sold in bags",
+                 "Total number of avocados sold",
+                 "Total number of avocados sold by 4046, it is a Product Lookup (PLU) code",
+                 "Total number of avocados sold by 4225, it is a Product Lookup (PLU) code",
+                 "Total number of avocados sold by 4770, it is a Product Lookup (PLU) code",
+                 "Missing information (Kar: The unit is actually per avocado instead of per bag- see section 5)",
+                 "Missing information (Kar:  The unit is actually per avocado, see section 5)",
+                 "Missing information (Kar: It should be the total number of avocado sold, not number of bags, see section 5)",
+                 "Missing information (Kar: It should be the total number of avocado sold, not number of bags, see section 5)",
+                 "conventional or organic",
+                 "the year",
+                 "the city or region of the observation")
+
+data.frame(Variable, Description) %>% 
+  kbl(align = "l", 
+      table.attr = "style = 'width: 60;'") %>% 
+  kable_styling(bootstrap_options = c("hover",
+                                      "bordered",
+                                      "striped"))
+
+```
+According to the [Hass Avocado Board website](https://loveonetoday.com/how-to/identify-hass-avocados/), 3 of the above mentioned Product Lookup (PLU) codes are:
+
+
+```{r, warning=FALSE, message=FALSE}
+
+PLU <- c("4046", "4225", "4770")
+Category <- c("Small/Medium Hass Avocado (~3-5oz avocado)", 
+              "Large Hass Avocado (~8-10oz avocado)",
+              "Extra Large Hass Avocado (~10-15oz avocado)")
+
+data.frame(PLU, Category) %>% 
+  kbl(align = "l",
+      table.attr = "style = 'width: 40;'") %>% 
+  kable_classic(c("hover", "condense"))
+
+
+```
+
+### 4.3 Data exploration
+
+This data set has 18,249 rows of data (or known as observation) and 14 variables. It has 1 character column, 1 date and 11 numeric columns. 
+
+* Following data summary table group these variables into different chunks with examples from the data set.
+* This table **n_missing** and **complete_rate** information to tell completeness within eac variable.
+
+
+***
+
+```{r}
+
+skim_without_charts(avocado)
+
+```
+***
+
+The data set is quite complete without any missing values. The columns **n_missing** and **complete_rate** indicate that all variables have 0 missing value and achieve 1 (100%) complete rate. 
+
+There are no white spaces to trim as well, by examining the column **whitespace**. 
+
+We can clearly see that in the middle section, **Variable type: Date**, shows that this data set was recorded from 2015-01-04 to 2018-03-25.
+
+
+## 5 DATA INTEGRITY ASSESSMENT
+
+### 5.1 "Unit" problems in the data
+
+Some important data problems have been identified. 
+
+* Variables "Total Volume", "4046", "4225", "4770", "Total Bags", "Small Bags", "Large Bags", and "XLarge Bags" should be integers because they are recording how many avocados were sold, and thus the values should not have floating numbers. Justin Kiggins (the *dataset creator* on *Kaggle*) has also confirmed with us that he was pretty sure these numbers are integers. I will follow his information and remove all the floating numbers (decimal numbers) during data cleaning.
+
+*Showing the first 3 rows of these columns:*
+
+```{r}
+avocado[1:3, 4:11]
+
+```
+
+Clich this [Link](https://www.kaggle.com/neuromusic/avocado-prices/discussion/64131) to the relevant discussion page:
+![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic1_UnitProblem.JPG)
+
+
+* However, there is still missing information to explain the unit of the **Total Bags**, **Small Bags**，**Large Bags**, and **XLarge Bags**. I was thinking that the unit must be "bag", however when I looked at the column "Total Volume", and found that it is actually the combination of the columns "4046", "4225", "4770", "Small Bags", "Large Bags", and "XLarge Bags". 
+
+*Try the calculation on the above first row* 
+
+4046 + 4225 + 4770 + Small Bags + Large Bags + XLarge Bag (*Notice: Total Bags is not included.*)  
+= 1036.74 + 54454.85 + 48.16	+ 8603.62	+ 93.25 + 0   
+=   
+```{r}
+1036.74 + 54454.85 + 48.16	+ 8603.62	+ 93.25 + 0
+
+```
+And it matches the value in the first row of **Total Volume**: **64236.62**.
+
+It should not be the case because bag columns should be in the unit of bags, and they should be converted into actual number of avocado sold before taking part into that addition. Quite strangely, I am not able to find the information regarding how many avocado in each size category of bag and thus I am not able to do the conversion.
+
+So, I would believe that the **values in the columns of Total, Small, Large, and XLarge Bags should be the actual amount of avocado sold already**, instead of in the unit of bag. The data supplier may have helped us done the the conversion.  
+
+These problems can be easily solved by,
+
+1. Taking the numbers in the columns "Total Volume", "4046", "4225", "4770", "Total Bags", "Small Bags", "Large Bags", and "XLarge Bags" as integers.  
+2. Taking the values in "Total Bags", "Small Bags", "Large Bags", and "XLarge Bags" as total number of avocados sold. 
+
+And **removing**:
+
+1. All the floating numbers in all the aforementioned columns.
+2. the column "Total Volume". It is an easy metric from the sum of 4046, 4225, 4770, and 3 sizes of bags, I will create a new one later after data cleaning.
+3. the column "Total Bags". It is an easy metric from the sum of the 3 sizes of bags. I will create a new one later after data cleaning, if required.
+
+These activities will be performed in the data cleaning section.
+
+### 5.2 Is the data ROCCC?
+
+I will examine the context of the data set on following aspects:
+
+1. Reliability - The data set come from reliable sources, It was from the Kaggle, a well known sites for professional data science community, as well as from the well-designed Google data analytic course that I completed. This data set should be free from unfairness elements, malicious manipulation, and biases from unprofessional practices during data collection and preliminary processing.   
+2. Original - I did not collect this data set myself but obtained from the Kaggle website, and the up-loader obtained from another website. I say it is a third-hand data, and which explains some ambiguity and confusion in the data set mentioned in the previous section.   
+3. Comprehensive - This data is not as comprehensive as I thought but should be enough for the core purpose of this personal project.  
+4. Cited - This data set has been cited on Kaggle website that links to the original paper, and identifying who are the authors.  
+5. Current - This data is not current as it is from 2015-01-04 to 2018-03-25.   
+
+In short, this data is moderately reliable, not original, less comprehensive, cited and not current. Therefore, these elements would affect the reliability of the results from this analysis. 
+
+## 6 DATA CLEANING AND MANIPULATION
+
+### 6.1 Convert column names to lower and snake case
+
+This is a standard naming convention in data industry to boost code readability and to avoid potential system errors due to spaces in the strings (character data) when using a programming language for analysis. For example, converting "Total Volume" into "total_volume" is often the standard approach. 
+
+Click the right button. 
+
+```{r}
+# The dataset is now called avocado2 and being worked on, I am preserving the original data set.
+avocado2 <- avocado 
+
+# to lower case
+names(avocado2) <- tolower(names(avocado2))
+
+# to snake case
+avocado2 <- avocado2 %>% 
+  rename("average_price" = "averageprice",
+         "total_volume" = "total volume",
+         "total_bags" = "total bags",
+         "amount_from_small_bags" = "small bags",
+         "amount_from_large_bags" = "large bags",
+         "amount_from_xlarge_bags" = "xlarge bags")
+
+# check out the column names
+
+```
+
+I use these codes to convert "averageprice", "total volume", "total bags", "small bags", "large bags", and "xlarge bags" into lower and snake case "average_price", "total_volume", "total_bags", "amount_from_small_bags", "amount_from_large_bags", and "amount_from_xlarge_bags".
+
+Checking these conversion using the first 3 rows:  
+
+```{r}
+
+avocado2[1:3,]
+
+```
+
+### 6.2 Renaming the "4046", ”4225", and "4770"
+
+This is also to reduce potential errors during data manipulation. They may be recognised as numbers during analysis instead of being recognised as column names. 
+
+Following codes complete the conversion. Click the right *code* button.
+
+```{r}
+
+avocado2 <- avocado2 %>% 
+  rename("PLU4046" = "4046",
+         "PLU4225" = "4225",
+         "PLU4770" = "4770")
+
+```
+
+### 6.3 Removing unwanted columns
+
+Removing "x1", "total_volume", and "total_bags". 
+
+* "x1" is redundant.    
+* "total_volume" -  It is just the sum of "4046", "4225", "4770", "total_bags", "small_bags", "large_bags", and "xlarge_bags".    
+* "total_bags" - It is just the sum of "small_bags", "large_bags", and "xlarge_bags".    
+
+Recall, I am removing "total_volume", and "total_bags" because their result is faulty as values within these associated columns are faulty. They should be integer but floating numbers were introduced - see section 5.1.  
+
+Using following codes (click right):
+
+```{r}
+avocado2 <- avocado2 %>% 
+  select(-x1, -total_volume, -total_bags)
+  
+```
+Now I have them removed. The number of column has now been reduced from 14 columns to 11 columns.
+
+```{r}
+avocado2[1:3,]
+
+```
+### 6.4 Removing decimal places
+
+This section removes erroneous decimal places in "PLU4046", "PLU4225", "PLU4770", "amount_from_small_bags", "amount_from_large_bags", and "amount_from_xlarge_bags" by rounding up. 
+
+```{r}
+
+avocado2 <- avocado2 %>% 
+  mutate(PLU4046 = round(PLU4046),
+         PLU4225 = round(PLU4225),
+         PLU4770 = round(PLU4770),
+         amount_from_small_bags = round(amount_from_small_bags),
+         amount_from_large_bags = round(amount_from_large_bags),
+         amount_from_xlarge_bags = round(amount_from_xlarge_bags))
+  
+  
+```
+
+### 6.5 Data type conversion
+
+Converting the variables "Type", "Year", and "region" from their data type (denoted as "chr", "dbl", "chr") into factor type (will be denoted as "fctr"), because they have categorical feature, by which they can be used to group the data during analysis, and be ordered into certain sequence of preference. 
+
+More importantly, their levels (elements within them) can be extracted using code and be inspected for errors such as misspelling. 
+ 
+Codes to complete the conversion, click right button: 
+
+```{r}
+avocado2 <- avocado2 %>% 
+  mutate_if(is.character, factor) %>% 
+  mutate(year = factor(year))
+
+```
+Checking is there errors within these variables, click the right button:
+
+```{r}
+avocado2 %>% 
+  select(type, year, region) %>% 
+  sapply(levels)
+
+```
+During inspection, I found there are no misspelling, spaces, or typo, and I am good to proceed.
+
+
+### 6.6 Managing the messy "region" data
+
+The "region" column from the data set is actually a faulty mix of cities, states and generic location such as "West" and "Northeast". It is quite a mess, but it is why I am here for. I will create a new column located before the "region" column and having it to group cities, stats and generic location, or something else if necessary.
+
+```{r, message=FALSE, warning=FALSE}
+avocado2 <- avocado2 %>% 
+  mutate(region_grouping = fct_collapse(region,
+    "state" = c("California", "SouthCarolina"),
+    "city" = c("Albany", "Atlanta", "BaltimoreWashington", "Boise", "Boston", "BuffaloRochester", "Charlotte", "Chicago", "CincinnatiDayton", "Columbus", "DallasFtWorth", "Denver", "Detroit", "GrandRapids", "GreatLakes", "HarrisburgScranton", "HartfordSpringfield", "Houston", "Indianapolis", "Jacksonville", "LasVegas", "LosAngeles", "Louisville", "MiamiFtLauderdale", "Nashville", "NewOrleansMobile", "NewYork", "Orlando", "Philadelphia", "PhoenixTucson", "Pittsburgh", "Plains", "Portland", "RaleighGreensboro", "RichmondNorfolk", "Roanoke", "Sacramento", "SanDiego", "SanFrancisco", "Seattle", "Spokane", "StLouis", "Syracuse", "Tampa", "WestTexNewMexico"),
+    "regional" = c("Midsouth", "Northeast", "NorthernNewEngland", "SouthCentral", "Southeast", "West"),
+    "Total" = c("TotalUS")
+  )) %>% 
+  relocate(region_grouping, .before = region)
+
+
+```
+
+*Please note: "BaltimoreWashington" is actually Baltimore in Maryland not Washington. It might be a typo.*
+
+```{r}
+
+avocado2 %>% 
+  select(region_grouping, region) %>% 
+  group_by(region_grouping) %>% 
+  summarise("region" = paste(unique(region), collapse = ", ")) %>% 
+  kbl(caption = "Doing my best to group US cities, states, and regional category based on information searched from Google Map (Finger-crossing)") %>% 
+  kable_styling(bootstrap_options = c("border", "hover"))
+    
+
+  
+```
+
+### 6.7 Synthesise metric
+
+Calculating the total of consumption by adding PLU4046, PLU4225, PLU4770, amount_from_small_bags, amount_from_large_bags, amount_from_large_bags.
+
+```{r}
+
+avocado2 <- avocado2 %>% 
+  mutate(total_consumption = PLU4046 + PLU4225 + PLU4770 + amount_from_small_bags + amount_from_large_bags + amount_from_xlarge_bags)
+
+```
+
+
+
+## 7 EXPLORATORY DATA ANALYSIS 
+
+### 7.1 Move to Houston?
+
+Following graph shows the average prices of avocado in each city farmed by **conventional** method. Click the right button to see codes.  
+
+```{r, message=FALSE, warning=FALSE, fig.width= 15, fig.height=9}
+
+avocado2 %>% 
+  filter(region_grouping == "city", type == "conventional") %>%           
+  select(date, region, average_price) %>% 
+  ggplot(aes(x = reorder(region, -average_price, na.rm = T), y = average_price)) +
+  geom_jitter(aes(colour = region, alpha = 0.5)) +
+  geom_violin(outlier.shape = NA, alpha = 0.5, size = 1) +
+  geom_hline(yintercept = 1.5, linetype = 2) +
+  geom_hline(yintercept = 1, linetype = 2) +
+  annotate("rect", xmin = "LosAngeles", xmax = "PhoenixTucson", ymin = -Inf, ymax = Inf, alpha = 0.2) +
+  geom_text(x = "WestTexNewMexico", y = 2.5, label = "My top 5 cities!", hjust = 0.5) +
+  stat_summary(fun = "mean") +
+  labs(x = "US City",
+       y = "Avocado prices", 
+       caption = "From 2015-01-04 to 2018-03-25 (1176 days)",
+       title = "Figure 1. Violin plot of Non-organic Avocado Prices",
+       subtitle = "Visual aids: (1) Black dots are average price of individual avocado by city between Jan-2015 to Mar-2018, (2) the plot has been ordered descendingly, (3) Body of violin become fatter when data points increase.") +
+  theme_classic() + 
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 25, vjust = 0.65),
+        plot.title = element_text(face = "bold", size = 15)) +
+  scale_y_continuous(lim = c(0, 3), breaks = seq(0, 3, 0.5))
+  
+
+```
+My top 5 cities of preference for non-organic avocado are: 
+
+```{r, warning=FALSE, message=FALSE}
+avocado2 %>% 
+  filter(region_grouping == "city", type == "conventional") %>%           
+  select(date, region, average_price) %>% 
+  group_by(region) %>% 
+  summarise(Average_price_per_avocado = paste0("$ ", round(mean(average_price), 2)),
+            Standard.deviation = paste0("$ ", round(sd(average_price), 2)),
+            max = paste0("$ ", round(max(average_price), 2)),
+            min = paste0("$ ", round(min(average_price), 2)),
+            median = paste0("$ ", round(median(average_price), 2))) %>% 
+  arrange(Average_price_per_avocado) %>% 
+  slice(1:5) %>% 
+  mutate(No. = row_number()) %>% 
+  relocate(No., .before = region) %>% 
+  rename(city = region) %>% 
+  kbl(align = "c",
+      table.attr = "style = 'widhth = 50;'") %>% 
+  kable_classic_2("hover")
+  
+
+
+```
+Looking good, there are Houston and Los Angeles. Good cities, near coastal, may be good for career opportunities as well. 
+
+Following graph shows the average prices of avocado in each city farmed by **organic** method. Click the right button to see codes. 
+```{r, message=FALSE, warning=FALSE, fig.width= 14, fig.height=9}
+
+
+avocado2 %>% 
+  filter(region_grouping == "city", type == "organic") %>%           
+  select(date, region, average_price) %>% 
+  ggplot(aes(x = reorder(region, -average_price, na.rm = T), y = average_price)) +
+  geom_jitter(aes(colour = region, alpha = 0.5)) +
+  geom_violin(outlier.shape = NA, alpha = 0.5, size = 1) +
+  geom_hline(yintercept = 1.5, linetype = 2) +
+  geom_hline(yintercept = 1, linetype = 2) +
+  annotate("rect", xmin = "CincinnatiDayton", xmax = "Houston", ymin = -Inf, ymax = Inf, alpha = 0.2) +
+  geom_text(x = "Denver", y = 2.7, label = "My top 5 cities!", hjust = 0.5) +
+  stat_summary(fun = "mean") +
+  labs(x = "US City",
+       y = "Avocado prices",
+       caption = "From 2015-01-04 to 2018-03-25 (1176 days)",
+       title = "Figure 2. Violin plot of Organic Avocado Prices",
+       subtitle = "Visual aids: (1) Black dots are average price of individual avocado by city between Jan-2015 to Mar-2018, (2) the plot has been ordered descendingly, (3) Body of violin become fatter when data points increase.") +
+  theme_classic() +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 25, vjust = 0.65),
+        plot.title = element_text(face = "bold", size = 15)) +
+  scale_y_continuous(lim = c(0, 3), breaks = seq(0, 3, 0.5)) 
+
+  
+```
+My top 5 cities of preference for organic avocado:
+
+```{r}
+avocado2 %>% 
+  filter(region_grouping == "city", type == "organic") %>%           
+  select(date, region, average_price) %>% 
+  group_by(region) %>% 
+  summarise(Average_price_per_avocado = paste0("$ ", round(mean(average_price), 2)),
+            Standard.deviation = paste0("$ ", round(sd(average_price), 2)),
+            max = paste0("$ ", round(max(average_price), 2)),
+            min = paste0("$ ", round(min(average_price), 2)),
+            median = paste0("$ ", round(median(average_price), 2))) %>% 
+  arrange(Average_price_per_avocado) %>% 
+  slice(1:5) %>% 
+  mutate(No. = row_number()) %>% 
+  relocate(No., .before = region) %>% 
+  rename(city = region) %>% 
+  kbl(align = "c",
+      table.attr = "style = 'width: 20;'") %>% 
+  kable_classic_2("hover")
+
+
+```
+Looking good, Houston again, ranked 1 now and Dallas ranked number 2. 
+
+This section shows Houston might be the best city I should move to. Even if I consume organic avocado at the maximum price of $1.92 whole year round with a minimum of 1 avocado per day, the maximum amount of spending will be: 
+
+```{r}
+1.92*365
+
+```
+It is still less than my budget of $800 / year. 
+
+However, I will carry out prediction later to ensure the price remains the similar for the next 24 months, hopefully.
+
+
+### 7.2 Where are my avocado fellows?
+
+Ii might be good to learn some avocado knowledge before going to the US, especially to find out which cities consume the most.
+
+Following graph shows:
+
+* The top 5 cities consume non-organic Avocado the most are GreatLakes, Los Angeles, Plains, New York, and Dallas.  
+* The top 5 cities consume organic Avocado the most are GreatLakes, Los Angeles, New York, Plains, and Seattle.  
+
+
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=12}
+# set up the df
+
+df7.2 <- avocado2 %>% 
+  select(type, region_grouping, region, total_consumption) %>% 
+  filter(region_grouping == "city") %>% 
+  group_by(type, region) %>% 
+  summarise(consumption = sum(total_consumption)) %>% 
+  group_by(type) %>% 
+  mutate(per = round(consumption/sum(consumption), 3)) %>% 
+  mutate(type = fct_recode(type,
+                           "Non-organic Avocado" = "conventional",
+                           "Organic Avocado" = "organic"))
+# plot the graph
+
+ggplot(df7.2, aes(area = consumption)) +
+  geom_treemap(aes(fill = type)) +
+  geom_treemap_text(aes(label = paste(region, "\n", prettyNum(consumption, big.mark = ","), "\n", per*100, "%")), place = "center",
+                    colour = "white") +
+  labs(title = "Figure 3. Total Avocado Consumption in 45 US cities using Tree Map",
+       caption = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)") +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 15),
+        strip.background = element_rect(fill = "white"),
+        plot.title = element_text(size = 20, face = "bold", hjust= 0.5, vjust = 2)) +
+  facet_wrap(~type)
+
+
+
+```
+
+Houston has a 4.5% consumption of avocado, though it is 3 times smaller than great Lakes but it has nearly 200 millions of consumption for nearly 3 years, it is tremendous. I am strongly confident that I would find my avocado fellows in the city.
+
+
+### 7.3 How is the organic avocado consumption? 
+
+#### 7.3.1 Consumption of organic avocado in the US
+
+```{r, fig.height=6, fig.width=7}
+
+df7.3.1 <-  avocado2 %>% 
+  filter(region_grouping == "city") %>% 
+  group_by(type) %>% 
+  summarise(overall_consumption = sum(total_consumption)) %>% 
+  mutate(per = round(overall_consumption/sum(overall_consumption)*100, 2),
+         per = paste0(per, "%")) %>% 
+  mutate(type = fct_recode(type,
+                           "Organic" = "organic",
+                           "Non-Organic" = "conventional"))
+
+ggplot(df7.3.1, aes(x = "", y = overall_consumption, fill = type)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(type, "\n", prettyNum(overall_consumption, big.mark = ","), "\n", per)), 
+                position = position_stack(vjust = 0.5)) +
+  coord_polar(theta = "y",
+              start = 0) + 
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        plot.title = element_text(size = 11, hjust = 0.5, face = "bold")) +
+  labs(title = "Figure 4. 97% of Avocado were Cosumed as Inorganic and 3% were Consumed as Organic",
+       caption = "From 2015-01-04 to 2018-03-25 (1176 days)") +
+  scale_fill_brewer(palette = "Set3")
+
+
+```
+
+
+
+#### 7.3.2 Consumption of organic avocado in the top 10 consumption cities in the US
+
+Drawing a quick bar chart to see how are the consumption different in the top 10 cities for two type of farming system.
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=14}
+df7.3.2 <- avocado2 %>% 
+  select(type, region_grouping, region, total_consumption) %>% 
+  filter(region_grouping == "city") %>% 
+  group_by(type, region) %>% 
+  summarise(consumption = sum(total_consumption)) %>% 
+  group_by(type) %>% 
+  mutate(per = round(consumption/sum(consumption), 3)) %>% 
+  mutate(type = fct_recode(type,
+                           "Non-organic Avocado" = "conventional",
+                           "Organic Avocado" = "organic"))
+
+df7.3.2 <- df7.3.2 %>% 
+  group_by(type) %>% 
+  arrange(desc(consumption)) %>% 
+  slice(1:10)
+
+
+ggplot(df7.3.2, aes(x = reorder(region, -consumption), y = consumption, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~type, scale = "free_x") +
+  theme_bw() + 
+  theme(legend.position = "none" ,
+        strip.text = element_text(size = 16),
+        plot.title = element_text(face = "bold", size = 20),
+        axis.text.x = element_text(angle = 25, vjust = 0.65, size = 12),
+        axis.title = element_text(size = 16),
+        axis.title.y = element_text(margin = margin(0, 15, 0, 0))) +
+  labs(x = "US City",
+       y = "Avocado consumption, per million", 
+       title = "Figure 5. Top 10 US cities Avocado Consumption by Bar Chart",
+       subtitle = "Consumption of non-organic Avocado is way more than organic Avocado at even 25 times differet in GreatLakes",
+       caption = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)") +
+  scale_y_continuous(lim = c(0, 600000000), 
+                     breaks = seq(0, 600000000, 50000000),  
+                     labels = function(x){x/1000000}) +  
+  geom_text(aes(label = paste0(round(consumption/1000000), " m")),  
+            vjust = -0.6) +
+  geom_vline(xintercept = "Houston", linetype = 2, alpha = 0.5, colour = "grey5")
+
+```
+
+* This graph shows that top 10 avocado consumption cities in the US prefer conventionally farmed avocado, and the reason behind might be due to cheaper price, based on this data set.   
+* In Houston, 98% of avocado consumers consumed non-organic avocado, and only 2% consume organic Avocado.  
+* In Houston, the consumption of organic avocado is 50 times lesser than the consumption of non-organic avocado.  
+
+
+
+### 7.4 How are people buying their avocados in the US?
+
+It will be interesting to see how are my fellow avocado lovers buying their fruits in the US, and especially in the Houston. 
+
+From the data set, there are variables categorising how avocados were sold, such as **PLU4046** which stands for small or medium Hass avocado, **PLU4225** stands for large Hass avocado, **PLU4770**  stands for extra large Hass avocado, and avocados that sold in small, large and xlarge bags.
+
+*Recall: Although the small, large and xlarge bags columns have their names suggest that the values within them have a unit of "per bag", however the unit is actually per avocado, not in the unit of bag.- see section 5.* 
+
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=12}
+
+# df preparation and data manipulation for pivot_longer
+
+df7.4 <-  avocado2 %>% 
+  filter(region_grouping == "city") %>% 
+  select(type, region, PLU4046, PLU4225, PLU4770, amount_from_small_bags, amount_from_large_bags, amount_from_xlarge_bags) %>% 
+  pivot_longer(c("PLU4046", "PLU4225", "PLU4770", "amount_from_small_bags", "amount_from_large_bags", "amount_from_xlarge_bags"),
+               names_to = "category",
+               values_to = "consumption_per_day")
+
+
+df7.4.2 <- df7.4 %>% 
+  group_by(type, category) %>% 
+  summarise(Total = sum(consumption_per_day)) %>% 
+  mutate(category = factor(category,
+                           levels = c("PLU4046", "PLU4225", "PLU4770", "amount_from_small_bags", "amount_from_large_bags", "amount_from_xlarge_bags")),
+         category = fct_recode(category,
+                               "large_bags" = "amount_from_large_bags",
+                               "small_bags" = "amount_from_small_bags",
+                               "Xlarge_bags" = "amount_from_xlarge_bags"),
+         type = fct_recode(type, 
+                           "Non-organic Avocado" = "conventional",
+                           "Organic Avocado" = "organic")) %>% 
+  group_by(type) %>% 
+  mutate(per = paste0(round(Total/sum(Total)*100, 2), "%"))
+
+
+
+ggplot(df7.4.2, aes(x = "", y = Total, fill = category)) +
+  geom_bar(stat = "identity") + 
+  coord_polar(theta = "y", start = 0) + 
+  geom_text(aes(label = paste0(category, "\n",
+                              prettyNum(Total, big.mark = ","), "\n",
+                               per)), 
+            position = position_stack(vjust = 0.5),
+            colour = "black") + 
+  theme_minimal() + 
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        strip.text = element_text(size = 15),
+        plot.title = element_text(size = 22, face = "bold", vjust = 1,
+                                  hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.text = element_blank()) +  
+  facet_wrap(~type, switch = "x") +  
+  labs(title = "Figure 6. Pie chart comparing the ways all avocados sold in the US",
+       subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
+
+
+
+
+```
+
+US people loves buying PLU4046 (32.2%) and PLU4225 (36%) non-organic avocado, they stands for "small or medium" size avocado and "large size" avocado. Not many Americans like extra large size avocado (PLU4770) with only 3.47%. For packaging size, people in the US love buying avocados packed in small bags at 21.69%, but not really prefer large and extra large packages.
+
+See the relevant statistics:
+
+```{r}
+
+df7.4.2 %>% 
+  filter(type == "Non-organic Avocado") %>% 
+  arrange(desc(Total)) %>% 
+  kbl(align = "c",
+      caption = "Overall consumption of Non-organic Avocado in the US") %>% 
+  kable_styling(bootstrap_options = c("hover", "bordered")) 
+
+
+```
+Above pie chart shows how small the consumption of organic avocado is as compared to non-organic avocado. The pies in the pie chart of the organic avocado might be too small to view, following pie chart is an extension of that chart.
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=10}
+
+ggplot(df7.4.2 %>% filter(type == "Organic Avocado"), aes(x = "", y = Total, fill = category)) +
+  geom_bar(stat = "identity") + 
+  coord_polar(theta = "y", start = 0) + 
+  geom_text(aes(label = paste0(category, "\n",
+                              prettyNum(Total, big.mark = ","), "\n",
+                               per)), 
+            position = position_stack(vjust = 0.5),
+            colour = "black") + 
+  theme_minimal() + 
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_text(face = "bold", size = 15),
+        strip.text = element_text(size = 14),
+        plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
+        plot.subtitle = element_text(hjust = 0.5)) +
+  facet_wrap(~ type, switch = "x") +
+   labs(title = "Figure 7. Pie chart comparing the ways Organic avocados sold in the US",
+        subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
+
+```
+
+```{r}
+
+df7.4.2 %>% 
+  filter(type == "Organic Avocado") %>% 
+  group_by(type) %>% 
+  arrange(desc(Total), .by_group = TRUE) %>%  
+  kbl(align = "c",
+      caption = "Overall consumption of Organic Avocado in the US") %>% 
+  kable_styling(bootstrap_options = c("hover", "bordered"))
+
+
+```
+
+In the organic avocado industry of the US, PLU4225 Avocado (small and medium size) is also the most popular avocados, extra large avocado size (PLU4770) and extra large bags are still the least preferred option, it is similar to the non-organic avocado industry. Organic consumers also love their avocado packed in small bags and large bags as compared to non-organic consumer. 
+
+
+### 7.5 How are people buying their avocado in Houston?
+
+According to figure 4 in section 7.3, 98% of avocado consumers in Houston consumed non-organic avocado, and only 2% consume organic avocado, between 2015-01-04 to 2018-03-25. Among the 98% non-organic avocado consumers, about 50% of them prefer small and medium size avocado (PLU4046), about 24% of them prefer large medium size avocado (PLU4225), and followed by 15.2% preference of avocados packed in small bags.  
+
+
+```{r, warning=FALSE, message=FALSE, fig.height=10, fig.width=14}
+
+df7.5 <- df7.4 %>% 
+  filter(region == "Houston") %>% 
+  group_by(type, category) %>% 
+  summarise(Total = sum(consumption_per_day)) %>% 
+  mutate(category = factor(category,
+                           levels = c("PLU4046", "PLU4225", "PLU4770", "amount_from_small_bags", "amount_from_large_bags", "amount_from_xlarge_bags")),
+         category = fct_recode(category,
+                               "large_bags" = "amount_from_large_bags",
+                               "small_bags" = "amount_from_small_bags",
+                               "Xlarge_bags" = "amount_from_xlarge_bags"),
+         type = fct_recode(type, 
+                           "Non-organic Avocado" = "conventional",
+                           "Organic Avocado" = "organic")) %>% 
+  group_by(type) %>% 
+  mutate(per = paste0(round(Total/sum(Total)*100, 2), "%"))
+
+ggplot(df7.5, aes(x = "", y = Total, fill = category)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y",
+              start = 0) + 
+  geom_text(aes(label = paste0(category, "\n",
+                              prettyNum(Total, big.mark = ","), "\n",
+                               per)), 
+            position = position_stack(vjust = 0.5),
+            colour = "black") + 
+  facet_wrap(~ type, switch = "x") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "OrRd") +
+    theme(legend.position = "none",
+        axis.title = element_blank(),
+        strip.text = element_text(size = 20),
+        plot.title = element_text(size = 22, face = "bold", vjust = 1,
+                                  hjust = 0.5),
+        plot.subtitle = element_text(size = 15, hjust = 0.5),
+        axis.text = element_blank()) +
+  labs(title = "Figure 8. Pie chart comparing the ways all avocados sold in the Houston",
+       subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
+
+
+```
+
+```{r}
+
+df7.5 %>% 
+  filter(type == "Non-organic Avocado") %>% 
+  arrange(desc(Total)) %>% 
+  kbl(align = "c",
+      caption = "Non-organic Avocado consumption with selling methods in Houston") %>% 
+  kable_styling(bootstrap_options = c("hover", "bordered"))
+
+```
+Whereas, among the 2% of organic consumers, they prefer their organic avocado packed in small bags (56.82%), then prefer small and medium size avocado (PLU4046), it was ranked the first preference for non-organic consumer. Again, extra large size avocado and extra large packing-bags are the least preferred option.
+
+```{r, warning=FALSE, message=FALSE, fig.height=7, fig.width=12}
+ggplot(df7.5 %>% filter(type == "Organic Avocado"), aes(x = "", y = Total, fill = category)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y",
+              start = 0) + 
+  geom_text(aes(label = paste0(category, "\n",
+                              prettyNum(Total, big.mark = ","), "\n",
+                               per)), 
+            position = position_stack(vjust = 0.5),
+            colour = "black") + 
+  facet_wrap(~ type) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "OrRd") +
+    theme(legend.position = "none",
+        axis.title = element_blank(),
+        strip.text = element_text(size = 20),
+        plot.title = element_text(size = 22, face = "bold", vjust = 1,
+                                  hjust = 0.5),
+        plot.subtitle = element_text(size = 15, hjust = 0.5),
+        axis.text = element_blank()) +
+  facet_wrap(~ type, switch = "x") +
+  labs(title = "Figure 9. Pie chart comparing the ways Organic avocados sold in the Houston",
+       subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
+```
+
+```{r}
+
+df7.5 %>% 
+  filter(type == "Organic Avocado") %>% 
+  arrange(desc(Total)) %>% 
+  kbl(align = "c",
+      caption = "Organic Avocado consumption with selling methods in Houston") %>% 
+  kable_styling(bootstrap_options = c("hover", "bordered"))
+
+```
+
+
+## 8 Predicting Avocado price in Houston
+
+This section I will first predict how are avocados prices in the US then followed by Houston. If predict prices in Houston exceed my budget, I will continue to search and predict other cities.  
+
+This section I will predict:
+
+* Non-organic avocado prices in the **US** 24 months after 2018-03-25  
+* Organic avocado prices in the **US** 24 months after 2018-03-25  
+* Non-organic avocado prices in the **Houston** 24 months after 2018-03-25  
+* Organic avocado prices in the **Houston**  24 months after 2018-03-25  
+
+
+#### 8.1 Forecast: Non-organic Avocado prices in US 
+
+This time plot shows the prices of non-organic avocado was relatively constant between 2015 and 2016, but followed by big fluctuations in 2016 and 2017. The graph seems **not stationary** and had a strong trend of increment of price per avocado over time though it dropped drastically in the end of 2017 and stabilised in the start of 2018. Seasonality is definitely present in the August, September, and October of 2016 and 2017.
+
+```{r, message=FALSE, warning=FALSE}
+
+conv_us <- avocado2 %>% 
+  filter(region_grouping == "city",
+         type == "conventional") %>% 
+  group_by(date) %>% 
+  summarise(average_price = mean(average_price))
+  
+# set up ts
+
+conv_us_ts <- ts(conv_us$average_price,
+                 start = c(2015, 1),
+                 frequency = 52) 
+# plot
+
+autoplot(conv_us_ts) +
+  labs(title = "Time plot: non-organic avocado weekly prices in the US",
+       subtitle = "Averaged from all cities",
+       y = "$") +
+  geom_point(colour = "brown", shape = 21) +
+  geom_path(colour = "brown")
+
+
+
+```
+
+The differencing plot below shows steep changes of prices near the beginning and end of 2017, suggesting there may be a seasonality.
+
+```{r}
+conv_us_ts_d <- diff(conv_us_ts)
+autoplot(conv_us_ts_d) + geom_point(colour = "brown", shape = 21) +
+  labs(title = "Differencing plot: Change in weekly prices of non-organic avocado in the US",
+       y = "$") 
+
+```
+
+Apart from visualising stationarity and seasonality, I can apply some statistical tests that give P-values to aid my observation:
+
+* Stationarity test has a P-value of 0.1563, rejecting the null hypothesis of the method and concludes a **non-stationarity** result. It matches my thought from the above graphs.   
+```{r}
+PP.test(conv_us_ts)
+# Null hypothesis: Not stationary
+# Fail to reject, so the object is not stationary. 
+
+```
+
+* Seasonality test rejects the null hypothesis of the test and conclude that the trend in the plot is **seasonal**. It again supports my thoughts that the dataset has seasonality. 
+
+```{r}
+summary(wo(conv_us_ts))
+
+```
+
+Looking at **exponential smoothing models (ETS)**, I know this method cannot be used for frequency that is higher than 24. My frequency is 52 becasuse I am forecasting base on weekly data and there are 52 weeks for a year. Click the right button.
+```{r}
+
+conv_us_ts_ETS <- ets(conv_us_ts)
+
+```
+
+I am now attempting to try out ARIMA models.
+
+```{r, warning=FALSE, message=FALSE, result = 'hide'}
+
+conv_us_ts_arima <- auto.arima(conv_us_ts,
+                         d = 1, 
+                         stepwise = F,
+                         approximation = F)
+
+```
+
+
+Ljung box test reveal a p-value of 0.7584, so I safely say there is no autocorrelation from this model and suggesting it is safe to proceed to forcasting.
+
+```{r}
+Box.test(conv_us_ts_arima$residuals, lag = 52, type = "Ljung-Box")
+```
+
+I can also visualise the autocorrelation by looking at the ACF-log plot. There is a little bit of autocorrelation left when Lag = 10. It should be fine as it is minor and supported by the result of Ljung box test. Additionallu, it is good to see that I have a normally distributed residuals.
+
+```{r}
+checkresiduals(conv_us_ts_arima)
+
+```
+
+```{r, message=TRUE, warning=FALSE}
+conv_us_ts_arima_fc <- forecast(conv_us_ts_arima, h = 104)
+
+autoplot(conv_us_ts_arima_fc) +
+  geom_hline(yintercept = 2, linetype = 2, colour = "blue") +
+  labs(subtitle = "Prediction of weekly prices of non-organic avocado prices in the US",
+       y = "$") +
+  geom_text(x = ymd(2018-01-01), y = 2.1, label = "hi")
+
+```
+
+
+* This forecast has nearly 95.93% of accuracy (100 - MAPE) base on the given data.  
+
+```{r}
+summary(conv_us_ts)   # or accuracy(organic_AA)
+
+```
+
+* The darker blue area is the 95% confidence interval, and non-organic avocado prices fall within $2 within the next two years after 2018.    
+
+#### 8.2 Forecast: Organic Avocado prices in US 
+
+Applying the same concepts as in the previous section. 
+
+```{r, message=FALSE, warning=FALSE}
+
+org_us <- avocado2 %>% 
+  filter(region_grouping == "city",
+         type == "organic") %>% 
+  group_by(date) %>% 
+  summarise(average_price = mean(average_price))
+  
+# set up ts
+
+org_us_ts <- ts(org_us$average_price,
+                 start = c(2015, 1),
+                 frequency = 52) 
+# plot
+
+autoplot(org_us_ts) +
+  labs(title = "Time plot: organic avocado weekly prices in the US",
+       subtitle = "Averaged from all cities",
+       y = "$") +
+  geom_point(colour = "darkgreen", shape = 21) +
+  geom_path(colour = "darkgreen")
+
+
+
+```
+
+* It is not stationary base on PP-test.  
+```{r}
+PP.test(org_us_ts)
+# Not stationary
+```
+* It is not seasonal, though there are 2 peaks in 2016 and 2017. The data set needs more years to prove it is seasonal.
+
+```{r}
+summary(wo(org_us_ts))
+```
+
+I will personally reject to follow this P-value as proved by my another plot (subseries plot) below, it shows possibility of seasonality. It might be masked by noises.
+
+```{r, fig.width=10}
+
+ggsubseriesplot(org_us_ts) +
+  geom_point(colour = "darkgreen", fill = "green", shape = 21, size = 3) +
+  labs(title = "Subseries plot: The changes of Yearly prices in each month",
+       y = "$",
+       subtitle = "Between week 34 to 43, most years seems to have slightly increase in prices and is suggesting a possible seasonality.") +
+  annotate("rect", xmin = 34, xmax = 43, ymin = -Inf, ymax = Inf, fill = "yellow", alpha = 0.1)
+
+```
+Hopefully, auto ARIMA should pick up the trend and seasonality and give a suitable model without autocorrelation.
+
+```{r, warning=FALSE, results='hide', message=FALSE}
+
+org_us_ts_arima <- auto.arima(org_us_ts, 
+                              d = 1,
+                              stepwise = F,
+                              approximation = F)
+
+```
+
+There are autocorrelation exists in the ACF-Lag plots of the chosen ARIMA model and suggesting there be data remain unexplained if forecast is to be proceeded. LJung-box test also supporting this result with P-value less than 0.05. 
+
+```{r}
+checkresiduals(org_us_ts_arima)
+
+```
+
+Declaring in the forecast of the existence of autocorrelation during ACF-Lag test. 
+
+```{r}
+org_us_ts_arima_fc <- forecast(org_us_ts_arima, h = 104)
+autoplot(org_us_ts_arima_fc) +
+  labs(subtitle = "Prediction of weekly prices of organic avocado in the US",
+       caption = "This is the best model of ARIMA but accuracy affected by autocorrelation.",
+       y = "$") +
+  geom_hline(yintercept = 2, linetype = 2, colour = "blue")
+
+```
+
+#### 8.3 Forecast: Non-organic Avocado prices in Houston 
+
+Applying the same concept as previous sections. Plotting the time plot first to observe trend stationary and seasonality. From observation, there are a lot of noises in the graph making seasonality vague, though there are a couple of obvious peaks between 2016 to 2017, and 2017 to 2018. There seems like a gradual positive trend though the price drops back to really low of near $0.55 near the end of the data trend.   
+
+```{r}
+
+conv_houston <- avocado2 %>% 
+  filter(region == "Houston",
+         type == "conventional") %>% 
+  group_by(date) %>% 
+  summarise(average_price = mean(average_price))
+  
+# set up ts   
+
+conv_houston_ts <- ts(conv_houston$average_price,
+                 start = c(2015, 1),
+                 frequency = 52) 
+# plot
+
+autoplot(conv_houston_ts) +
+  labs(title = "Time plot: non-organic avocado weekly prices in Houston",
+       y = "$") +
+  geom_point(colour = "brown", shape = 21) +
+  geom_path(colour = "brown")
+
+```
+
+I have a p-value from stationary test showing a result of higher than 0.05, and the test says the graph is not stationary. 
+
+```{r}
+PP.test(conv_houston_ts)
+```
+
+There are too much noises in the graph, and the seasonality tests does not identify seasonality in the graph. 
+
+```{r}
+summary(wo(conv_houston_ts))
+```
+
+
+Applying the auto_arima functions in R to choose the best model. 
+
+```{r, results='hide', message=FALSE, warning=FALSE}
+
+conv_houston_ts_arima <- auto.arima(conv_houston_ts,
+                                    d = 1,
+                                    approximation = F,
+                                    stepwise = F,
+                                    trace = T)
+  
+```
+
+Testing the model for autocorrelation existence. The ACF-Lag graph shows that the model can explain most of the data in the dataset, only left with just a few, minor autocorrelation. This suggesting I am safe to proceed with forecasting. 
+
+```{r}
+
+checkresiduals(conv_houston_ts_arima)
+
+```
+
+Creating the forecast of non-organic avocado in the Houston for next 2 years.
+
+```{r}
+
+conv_houston_ts_arima_fc <- forecast(conv_houston_ts_arima, h = 104)
+
+autoplot(conv_houston_ts_arima_fc) + labs(subtitle = "Prediction of weekly prices of non-organic avocado in Houston",
+       y = "$") +
+  geom_hline(yintercept = 2, linetype = 2, colour = "blue")
+
+```
+
+The accuracy of this forecast is 92.97% (1 - MAPE)
+```{r}
+summary(conv_houston_ts_arima)
+```
+
+
+* The plot shows the 95% confidence interval (darker blue area) in the forecast zone does not exceed $2 for the next 2 years after 2018.   
+* It is a good sign. My threshold is to hope for avocado price not to exceed $2 per unit. So that I can consume minimum 1 per day (set in the scenario) and meeting the budget of 800 dollars per year.   
+
+
+#### 8.4 Forecast: Organic Avocado prices in Houston
+
+Hopefully organic avocado has a good range of prices in next two years.
+
+Time plot showing the overall weekly changes of avocado price from 2015-01-04 to 2018-03-25. 
+
+```{r}
+
+# set up df for this section
+
+org_houston <- avocado2 %>% 
+  filter(type == "organic",
+         region == "Houston") %>% 
+  arrange(date)
+
+# set up ts df
+
+org_houston_ts <- ts(org_houston$average_price,
+                 frequency = 52,      # My data is weekly. 
+                 start = c(2015, 1))                      
+
+#Plot
+
+autoplot(org_houston_ts) +
+  labs(title = "Time plot: organic avocado weekly prices in Houston",
+       caption = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)",
+       y = "Price per Avocado ($)") +
+  geom_point(colour = "darkgreen", shape = 21) +
+  geom_path(colour = "darkgreen")
+
+```
+
+From the first year of our data, organic price of avocado in the first 6 months of 2015 was relatively constant, however, the price fluctuated drastically in the next 2 to 3 years. 
+
+
+Stationary test fails to reject the null hypothesis (P-value = 0.2311) and says the trend is not stationary. 
+```{r}
+PP.test(org_houston_ts)
+```
+
+There is no indication of seasonality from its P-value. 
+
+```{r}
+summary(wo(org_houston_ts))
+```
+
+**Exponential Smoothing models (ETS)** 
+
+I am apply ETS modeling using following codes. However, this model can't handle frequency greater than 24, I have a frequency of 52 because my data is weekly data. I will then choose another model for my forecasting.
+
+```{r}
+
+org_houston_ts_ets <- ets(org_houston_ts)
+
+
+```
+**ARIMA Model**
+
+Applying ARIMA model for my forecast.
+
+```{r, results='hide', warning=FALSE, message=FALSE}
+
+org_houston_ts_arima <- auto.arima(org_houston_ts,
+                               d = 1, 
+                               stepwise = F,
+                               approximation = F,
+                               trace = T)
+```
+
+Residuals-check shows that ACF-Lag has not much autocorrelation left, the model can explain most of the data and is using the data quite well. There is a normal distribution of residuals as well. 
+
+```{r}
+
+checkresiduals(org_houston_ts_arima)
+
+```
+
+Testing Ljung-Box test, p-value is greater than 0.05, then I safely say no autocorrelation is present. I can safely use this model for the purpose of forecasting.
+
+```{r}
+Box.test(org_houston_ts_arima$residuals, lag = 52, type = "Ljung-Box")
+
+```
+
+Synthesising the forecast graph.
+
+```{r}
+
+org_houston_ts_arima_fc <- forecast(org_houston_ts_arima)
+
+autoplot(org_houston_ts_arima_fc, h = 104) +
+  labs(subtitle = "Prediction of weekly prices of non-organic avocado in Houston",
+       y = "$") +
+  geom_vline(xintercept = 2019, linetype = 2, colour = "red") +
+  geom_hline(yintercept = 2, linetype = 2, colour = "blue") +
+  geom_text(x = 2.5, y = 2019)
+
+```
+
+
+This model has nearly 95% (94.9515) of accuracy (100 - MAPE).
+
+```{r}
+summary(org_houston_ts_arima)   # or accuracy(organic_AA)
+
+```
+
+Bad news is that after 2019, price per organic avocado may exceed $2. And I might switch to non-organic avocado. 
+
+
+
+## 9 CONCLUSION
+
+* Phoenix Tuscon, Houston, West Tex New Mexico, Dallas, and Los Angeles are the top 5 cities for cheap non-organic avocados, with maximum price among them being $1.8 across the period given in the data set.  
+* Houston, Dallas, Denver, Cincinnati Dayton, Roanoke, and West Tex New Mexico are the top 5 cities for cheap organic avocados, with maximum price among them being $2.27.   
+* 97% of avocados in the US were sold as non-organic avocado, and organic avocado consumption was only 3%.  
+* In US, Great Lakes, Los Angeles and Plains are the top 3 cities consumed non-organic avocado the most at 12.8%, 11.2%, 6.8%.    
+* In US, Great Lakes, Los Angeles, New York are the top 3 cities consumed organic avocado the most at 16.2%, 9.9%, and 6.6%.   
+* Most popular non-organic avocado selling method in the US is to sell avocados in small and medium size (PLU4225) with popularity at 36%, followed by large size avocado (PLU4046) 32.2%, and small package (21.69%). Large package, extra large avocado (PLU4770), and extra large package are the least prefer selling method.   
+* Organic avocado consumers also prefer small and medium size avocado (PLU4225), at 36.55%, then followed by small package at 33.26%, large bags at 16.4%, then PLU4046 and PLU4770 at 13.24% and 0.56% respectively. No extra large packages were sold.  
+* Picked Houston as the city of first preference athe city is the second cheapest non-organic avocado city, the cheapest organic avocado city, and is one of the top 10 most avocado-consuming cities.
+* From my forecast, 95% of non-organic avocado prices would fall below my threshold of 2 dollars per unit avocado in the upcoming 24 months after 2018 March 25. However, for organic avocado, 95% of chance that their prices may exceed 2 dollars seasonally.    
+* From my forecast, 95% of non-organic avocado prices in Houston would fall below my threshold of $2 per unit, but for organic avocado, 95% of chance that the price may exceed 2 dollars after 2019.   
+
+The best city for me to move to is Houston, I am buying organic avocados until the end of 2019, then switch to non-organic ones. These conditions fulfilled my desire of at least 1 avocado per day, not exceeding threshold of $800 per year, and in the same time being environmental friendlier.  
+
+
+
+## 10 LEGALITY
+
+This is a personal project created and designed for non-commercial use only. The data set of this personal project was introduced by Google data analytic certificate course and was made available for students for some analytics practices in the course. This is a public data set from *Kaggle*. Please visit Topic 4 in this project for the link. This project extends the analysis scope of the course. This personal project was not submitted and graded by Google. Google and I, nor any stakeholders relevant to the creation of this project held any responsibility for any outcomes affected from using the results of this project. This project is only for educational and skill demonstration purposes. 
+
+All photos in this project, such as those as the thumbnail are just for demonstration only, they have nothing to do with the data set, the location where the data were collected, and the results of this analysis. 
+
+
+## 11 REFERENCE 
+
+the Hass Avocado Board n.d., *How to Identify Hass Avocadoes*, viewed 18 June 2021， 2021，https://loveonetoday.com/how-to/identify-hass-avocados/ 
+
+Overview of Avocado Datasets n.d., viewed 18 June 2021, https://cran.r-project.org/web/packages/avocado/vignettes/a_intro.html
+
+Russell M 2020, *Avocado New Zealand avocado returns high despite COVID-19 affected season*, viewed 18 June 2021, https://www.freshplaza.com/article/9233181/new-zealand-avocado-returns-high-despite-covid-19-affected-season/
+
+
+
+

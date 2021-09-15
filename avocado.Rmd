@@ -3,20 +3,16 @@ title: "Which city in the US has the cheapest Avocado?"
 author: "Kar Ng"
 date: "2021"
 output:
-  html_document:
-    code_folding: hide
-    df_print: paged
+  github_document:
     toc: true
     toc_depth: 4
-    toc_float: true
-  pdf_document:
-    toc: yes
+always_allow_html: yes
 subtitle: Personal project
 ---
 
 ***  
 
-![Photo by Russell 2020](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\thumbnail1.png)
+![Photo by Russell 2020](https://raw.githubusercontent.com/KAR-NG/avocado/main/thumbnail1.png)
 
 ***  
 
@@ -39,7 +35,7 @@ Results reveal that 97% of avocados in the US were sold as non-organic avocado, 
 
 
 
-![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic4_combined.png)
+![](https://raw.githubusercontent.com/KAR-NG/avocado/main/pic4_combined.png)
 
 
 ## 2 R PACKAGES
@@ -65,12 +61,12 @@ library(seastests)
 In this scenario - (1) I am an avocado lover, (2) I must consume minimum of 1 avocado per day, and (3) I am migrating to US next year to experience US life. 
 
 
-![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic3_avocombine.JPG)
+![](https://raw.githubusercontent.com/KAR-NG/avocado/main/pic3_avocombine.JPG)
 
 
-I would like to move to a US city with cheap avocado. Despite I would like to eat as more as possible but I still have a budget of $800 per year allocated for avocado consumption. 
+I would like to move to a US city with cheap avocado. Despite I would like to eat as more avocado as possible but I still have a budget of $800 per year allocated for avocado consumption. 
 
-In my plan, I would like find out the top-5 cities where avocados are the cheapest and hopefully the cheap price remains similar in the next 2 years after I move there. It will be great if I can contribute something for the environment by eating organic avocado. Of course, if the organic price is within my budget. 
+In my plan, I would like find out the top-5 cities where have the cheapest avocado and hopefully the price remains similar in the next 2 years. It will be great if I can contribute something for the environment by eating organic avocado. Of course, if the organic avocado price is within my budget. 
 
 I hope this project can give me some insightful answers!
 
@@ -91,7 +87,7 @@ This section imports the "Avocado Price" data set into R with a given data set n
 ```{r, message = FALSE, warning = FALSE}
 
 avocado <- read_csv("avocado.csv")
-avocado
+head(avocado)
 
 
 ```
@@ -198,7 +194,8 @@ avocado[1:3, 4:11]
 ```
 
 Clich this [Link](https://www.kaggle.com/neuromusic/avocado-prices/discussion/64131) to the relevant discussion page:
-![](C:\Users\karho\Desktop\Google Data Analytics Certificate\Course 8 Materials - Capstone project\avocado\pic1_UnitProblem.JPG)
+
+![](https://raw.githubusercontent.com/KAR-NG/avocado/main/pic1_UnitProblem.JPG)
 
 
 * However, there is still missing information to explain the unit of the **Total Bags**, **Small Bags**，**Large Bags**, and **XLarge Bags**. I was thinking that the unit must be "bag", however when I looked at the column "Total Volume", and found that it is actually the combination of the columns "4046", "4225", "4770", "Small Bags", "Large Bags", and "XLarge Bags". 
@@ -310,15 +307,17 @@ Using following codes (click right):
 
 ```{r}
 avocado2 <- avocado2 %>% 
-  select(-x1, -total_volume, -total_bags)
-  
+  select(-...1, -total_volume, -total_bags)
+
 ```
-Now I have them removed. The number of column has now been reduced from 14 columns to 11 columns.
+
+Now I have them removed. The number of column has now been reduced from 14 to 11 columns.
 
 ```{r}
 avocado2[1:3,]
 
 ```
+
 ### 6.4 Removing decimal places
 
 This section removes erroneous decimal places in "PLU4046", "PLU4225", "PLU4770", "amount_from_small_bags", "amount_from_large_bags", and "amount_from_xlarge_bags" by rounding up. 
@@ -880,7 +879,7 @@ df7.5 %>%
 
 ## 8 Predicting Avocado price in Houston
 
-This section I will first predict how are avocados prices in the US then followed by Houston. If predict prices in Houston exceed my budget, I will continue to search and predict other cities.  
+I will first forcast how are avocados prices in the US then followed by Houston. If predicted prices in Houston exceed my budget, I will continue to search and predict other cities.  
 
 This section I will predict:
 

@@ -404,6 +404,11 @@ avocado2 <- avocado2 %>%
 ```
 
 
+```{r}
+write_csv(avocado2, "avocado2.csv")
+```
+
+
 
 ## 7 EXPLORATORY DATA ANALYSIS 
 
@@ -876,7 +881,16 @@ df7.5 %>%
 
 ```
 
+### 7.6 PowerBI 
 
+It is an interactive PowerBI dashboard hosted locally.
+
+![](https://raw.githubusercontent.com/KAR-NG/Houston_Avocado_Prices_EDA_-_Forecast/main/pic5_powerbi.JP)
+
+It can be deployed to the server and smartphone app only if I am working for you and using your work email address. It is a restriction of this software that only work email is allowed to enjoy dashboard deployment. 
+ 
+ 
+ 
 ## 8 Predicting Avocado price in Houston
 
 I will first forcast how are avocados prices in the US then followed by Houston. If predicted prices in Houston exceed my budget, I will continue to search and predict other cities.  
@@ -900,15 +914,17 @@ conv_us <- avocado2 %>%
          type == "conventional") %>% 
   group_by(date) %>% 
   summarise(average_price = mean(average_price))
-  
+
+
 # set up ts
 
 conv_us_ts <- ts(conv_us$average_price,
                  start = c(2015, 1),
                  frequency = 52) 
+
 # plot
 
-autoplot(conv_us_ts) +
+forecast::autoplot(conv_us_ts) +
   labs(title = "Time plot: non-organic avocado weekly prices in the US",
        subtitle = "Averaged from all cities",
        y = "$") +
@@ -919,7 +935,7 @@ autoplot(conv_us_ts) +
 
 ```
 
-The differencing plot below shows steep changes of prices near the beginning and end of 2017, suggesting there may be a seasonality.
+The *differencing* plot below shows steep changes of prices near the beginning and end of 2017, suggesting there may be a seasonality.
 
 ```{r}
 conv_us_ts_d <- diff(conv_us_ts)
@@ -937,12 +953,14 @@ PP.test(conv_us_ts)
 # Null hypothesis: Not stationary
 # Fail to reject, so the object is not stationary. 
 
+
 ```
 
 * Seasonality test rejects the null hypothesis of the test and conclude that the trend in the plot is **seasonal**. It again supports my thoughts that the dataset has seasonality. 
 
 ```{r}
 summary(wo(conv_us_ts))
+
 
 ```
 
@@ -969,6 +987,7 @@ Ljung box test reveal a p-value of 0.7584, so I safely say there is no autocorre
 
 ```{r}
 Box.test(conv_us_ts_arima$residuals, lag = 52, type = "Ljung-Box")
+
 ```
 
 I can also visualise the autocorrelation by looking at the ACF-log plot. There is a little bit of autocorrelation left when Lag = 10. It should be fine as it is minor and supported by the result of Ljung box test. Additionallu, it is good to see that I have a normally distributed residuals.

@@ -41,6 +41,7 @@ Kar Ng
         US?](#74-how-are-people-buying-their-avocados-in-the-us)
     -   [7.5 How are people buying their avocado in
         Houston?](#75-how-are-people-buying-their-avocado-in-houston)
+    -   [7.6 PowerBI](#76-powerbi)
 -   [8 Predicting Avocado price in
     Houston](#8-predicting-avocado-price-in-houston)
     -   [8.1 Forecast: Non-organic Avocado prices in
@@ -167,13 +168,13 @@ head(avocado)
 
     ## # A tibble: 6 x 14
     ##    ...1 Date       AveragePrice `Total Volume` `4046`  `4225` `4770` `Total Bags`
-    ##   <dbl> <date>            <dbl>          <dbl>  <dbl>   <dbl>  <dbl>        <dbl>
-    ## 1     0 2015-12-27         1.33         64237.  1037.  54455.   48.2        8697.
-    ## 2     1 2015-12-20         1.35         54877.   674.  44639.   58.3        9506.
-    ## 3     2 2015-12-13         0.93        118220.   795. 109150.  130.         8145.
-    ## 4     3 2015-12-06         1.08         78992.  1132   71976.   72.6        5811.
-    ## 5     4 2015-11-29         1.28         51040.   941.  43838.   75.8        6184.
-    ## 6     5 2015-11-22         1.26         55980.  1184.  48068.   43.6        6684.
+    ##   <dbl> <chr>             <dbl>          <dbl>  <dbl>   <dbl>  <dbl>        <dbl>
+    ## 1     0 12/27/2015         1.33         64237.  1037.  54455.   48.2        8697.
+    ## 2     1 12/20/2015         1.35         54877.   674.  44639.   58.3        9506.
+    ## 3     2 12/13/2015         0.93        118220.   795. 109150.  130.         8145.
+    ## 4     3 12/6/2015          1.08         78992.  1132   71976.   72.6        5811.
+    ## 5     4 11/29/2015         1.28         51040.   941.  43838.   75.8        6184.
+    ## 6     5 11/22/2015         1.26         55980.  1184.  48068.   43.6        6684.
     ## # ... with 6 more variables: Small Bags <dbl>, Large Bags <dbl>,
     ## #   XLarge Bags <dbl>, type <chr>, year <dbl>, region <chr>
 
@@ -482,15 +483,7 @@ Column type frequency:
 character
 </td>
 <td style="text-align:left;">
-2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Date
-</td>
-<td style="text-align:left;">
-1
+3
 </td>
 </tr>
 <tr>
@@ -553,6 +546,32 @@ whitespace
 <tbody>
 <tr>
 <td style="text-align:left;">
+Date
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+169
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 type
 </td>
 <td style="text-align:right;">
@@ -601,61 +620,6 @@ region
 </td>
 <td style="text-align:right;">
 0
-</td>
-</tr>
-</tbody>
-</table>
-
-**Variable type: Date**
-
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">
-skim\_variable
-</th>
-<th style="text-align:right;">
-n\_missing
-</th>
-<th style="text-align:right;">
-complete\_rate
-</th>
-<th style="text-align:left;">
-min
-</th>
-<th style="text-align:left;">
-max
-</th>
-<th style="text-align:left;">
-median
-</th>
-<th style="text-align:right;">
-n\_unique
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Date
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-2015-01-04
-</td>
-<td style="text-align:left;">
-2018-03-25
-</td>
-<td style="text-align:left;">
-2016-08-14
-</td>
-<td style="text-align:right;">
-169
 </td>
 </tr>
 </tbody>
@@ -1226,10 +1190,10 @@ avocado2[1:3,]
 
     ## # A tibble: 3 x 14
     ##    ...1 date       average_price total_volume `4046`  `4225` `4770` total_bags
-    ##   <dbl> <date>             <dbl>        <dbl>  <dbl>   <dbl>  <dbl>      <dbl>
-    ## 1     0 2015-12-27          1.33       64237.  1037.  54455.   48.2      8697.
-    ## 2     1 2015-12-20          1.35       54877.   674.  44639.   58.3      9506.
-    ## 3     2 2015-12-13          0.93      118220.   795. 109150.  130.       8145.
+    ##   <dbl> <chr>              <dbl>        <dbl>  <dbl>   <dbl>  <dbl>      <dbl>
+    ## 1     0 12/27/2015          1.33       64237.  1037.  54455.   48.2      8697.
+    ## 2     1 12/20/2015          1.35       54877.   674.  44639.   58.3      9506.
+    ## 3     2 12/13/2015          0.93      118220.   795. 109150.  130.       8145.
     ## # ... with 6 more variables: amount_from_small_bags <dbl>,
     ## #   amount_from_large_bags <dbl>, amount_from_xlarge_bags <dbl>, type <chr>,
     ## #   year <dbl>, region <chr>
@@ -1279,13 +1243,13 @@ avocado2[1:3,]
 ```
 
     ## # A tibble: 3 x 11
-    ##   date       average_price PLU4046 PLU4225 PLU4770 amount_from_small_bags
-    ##   <date>             <dbl>   <dbl>   <dbl>   <dbl>                  <dbl>
-    ## 1 2015-12-27          1.33   1037.  54455.    48.2                  8604.
-    ## 2 2015-12-20          1.35    674.  44639.    58.3                  9408.
-    ## 3 2015-12-13          0.93    795. 109150.   130.                   8042.
-    ## # ... with 5 more variables: amount_from_large_bags <dbl>,
-    ## #   amount_from_xlarge_bags <dbl>, type <chr>, year <dbl>, region <chr>
+    ##   date       average_price PLU4046 PLU4225 PLU4770 amount_from_sma~ amount_from_lar~
+    ##   <chr>              <dbl>   <dbl>   <dbl>   <dbl>            <dbl>            <dbl>
+    ## 1 12/27/2015          1.33   1037.  54455.    48.2            8604.             93.2
+    ## 2 12/20/2015          1.35    674.  44639.    58.3            9408.             97.5
+    ## 3 12/13/2015          0.93    795. 109150.   130.             8042.            103. 
+    ## # ... with 4 more variables: amount_from_xlarge_bags <dbl>, type <chr>,
+    ## #   year <dbl>, region <chr>
 
 ### 6.4 Removing decimal places
 
@@ -1460,6 +1424,10 @@ avocado2 <- avocado2 %>%
   mutate(total_consumption = PLU4046 + PLU4225 + PLU4770 + amount_from_small_bags + amount_from_large_bags + amount_from_xlarge_bags)
 ```
 
+``` r
+write_csv(avocado2, "avocado2.csv")
+```
+
 ## 7 EXPLORATORY DATA ANALYSIS
 
 ### 7.1 Move to Houston?
@@ -1491,7 +1459,7 @@ avocado2 %>%
   scale_y_continuous(lim = c(0, 3), breaks = seq(0, 3, 0.5))
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-20-1.png)<!-- --> My top 5
+![](avocado_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> My top 5
 cities of preference for non-organic avocado are:
 
 ``` r
@@ -1689,7 +1657,7 @@ avocado2 %>%
   scale_y_continuous(lim = c(0, 3), breaks = seq(0, 3, 0.5)) 
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-22-1.png)<!-- --> My top 5
+![](avocado_files/figure-gfm/unnamed-chunk-23-1.png)<!-- --> My top 5
 cities of preference for organic avocado:
 
 ``` r
@@ -1915,7 +1883,7 @@ ggplot(df7.2, aes(area = consumption)) +
   facet_wrap(~type)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 Houston has a 4.5% consumption of avocado, though it is 3 times smaller
 than great Lakes but it has nearly 200 millions of consumption for
@@ -1953,7 +1921,7 @@ ggplot(df7.3.1, aes(x = "", y = overall_consumption, fill = type)) +
   scale_fill_brewer(palette = "Set3")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 #### 7.3.2 Consumption of organic avocado in the top 10 consumption cities in the US
 
@@ -2001,7 +1969,7 @@ ggplot(df7.3.2, aes(x = reorder(region, -consumption), y = consumption, fill = t
   geom_vline(xintercept = "Houston", linetype = 2, alpha = 0.5, colour = "grey5")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 -   This graph shows that top 10 avocado consumption cities in the US
     prefer conventionally farmed avocado, and the reason behind might be
@@ -2076,7 +2044,7 @@ ggplot(df7.4.2, aes(x = "", y = Total, fill = category)) +
        subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 US people loves buying PLU4046 (32.2%) and PLU4225 (36%) non-organic
 avocado, they stands for “small or medium” size avocado and “large size”
@@ -2231,7 +2199,7 @@ ggplot(df7.4.2 %>% filter(type == "Organic Avocado"), aes(x = "", y = Total, fil
         subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ``` r
 df7.4.2 %>% 
@@ -2408,7 +2376,7 @@ ggplot(df7.5, aes(x = "", y = Total, fill = category)) +
        subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 ``` r
 df7.5 %>% 
@@ -2558,7 +2526,7 @@ ggplot(df7.5 %>% filter(type == "Organic Avocado"), aes(x = "", y = Total, fill 
        subtitle = "Total consumption From 2015-01-04 to 2018-03-25 (1176 days)")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 ``` r
 df7.5 %>% 
@@ -2677,6 +2645,16 @@ Xlarge\_bags
 </tbody>
 </table>
 
+### 7.6 PowerBI
+
+It is an interactive PowerBI dashboard hosted locally.
+
+![](https://raw.githubusercontent.com/KAR-NG/Houston_Avocado_Prices_EDA_-_Forecast/main/pic5_powerbi.JP)
+
+It can be deployed to the server and smartphone app only if I am working
+for you and using your work email address. It is a restriction of this
+software that only work email is allowed to enjoy dashboard deployment.
+
 ## 8 Predicting Avocado price in Houston
 
 I will first forcast how are avocados prices in the US then followed by
@@ -2708,15 +2686,17 @@ conv_us <- avocado2 %>%
          type == "conventional") %>% 
   group_by(date) %>% 
   summarise(average_price = mean(average_price))
-  
+
+
 # set up ts
 
 conv_us_ts <- ts(conv_us$average_price,
                  start = c(2015, 1),
                  frequency = 52) 
+
 # plot
 
-autoplot(conv_us_ts) +
+forecast::autoplot(conv_us_ts) +
   labs(title = "Time plot: non-organic avocado weekly prices in the US",
        subtitle = "Averaged from all cities",
        y = "$") +
@@ -2724,9 +2704,9 @@ autoplot(conv_us_ts) +
   geom_path(colour = "brown")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
-The differencing plot below shows steep changes of prices near the
+The *differencing* plot below shows steep changes of prices near the
 beginning and end of 2017, suggesting there may be a seasonality.
 
 ``` r
@@ -2736,7 +2716,7 @@ autoplot(conv_us_ts_d) + geom_point(colour = "brown", shape = 21) +
        y = "$") 
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
 
 Apart from visualising stationarity and seasonality, I can apply some
 statistical tests that give P-values to aid my observation:
@@ -2753,7 +2733,7 @@ PP.test(conv_us_ts)
     ##  Phillips-Perron Unit Root Test
     ## 
     ## data:  conv_us_ts
-    ## Dickey-Fuller = -3.006, Truncation lag parameter = 4, p-value = 0.1563
+    ## Dickey-Fuller = -12.845, Truncation lag parameter = 4, p-value = 0.01
 
 ``` r
 # Null hypothesis: Not stationary
@@ -2770,10 +2750,10 @@ summary(wo(conv_us_ts))
 
     ## Test used:  WO 
     ##  
-    ## Test statistic:  1 
-    ## P-value:  3.39749e-07 1.786835e-05 0.01781721 
+    ## Test statistic:  0 
+    ## P-value:  1 1 0.6374636 
     ##  
-    ## The WO - test identifies seasonality
+    ## The WO - test does not identify  seasonality
 
 Looking at **exponential smoothing models (ETS)**, I know this method
 cannot be used for frequency that is higher than 24. My frequency is 52
@@ -2808,7 +2788,7 @@ Box.test(conv_us_ts_arima$residuals, lag = 52, type = "Ljung-Box")
     ##  Box-Ljung test
     ## 
     ## data:  conv_us_ts_arima$residuals
-    ## X-squared = 44.561, df = 52, p-value = 0.7584
+    ## X-squared = 38.73, df = 52, p-value = 0.9139
 
 I can also visualise the autocorrelation by looking at the ACF-log plot.
 There is a little bit of autocorrelation left when Lag = 10. It should
@@ -2820,15 +2800,15 @@ residuals.
 checkresiduals(conv_us_ts_arima)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
     ## 
     ##  Ljung-Box test
     ## 
-    ## data:  Residuals from ARIMA(0,1,0)(1,0,0)[52]
-    ## Q* = 24.408, df = 33, p-value = 0.8605
+    ## data:  Residuals from ARIMA(2,1,3)
+    ## Q* = 26.336, df = 29, p-value = 0.6075
     ## 
-    ## Model df: 1.   Total lags used: 34
+    ## Model df: 5.   Total lags used: 34
 
 ``` r
 conv_us_ts_arima_fc <- forecast(conv_us_ts_arima, h = 104)
@@ -2840,7 +2820,7 @@ autoplot(conv_us_ts_arima_fc) +
   geom_text(x = ymd(2018-01-01), y = 2.1, label = "hi")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
 
 -   This forecast has nearly 95.93% of accuracy (100 - MAPE) base on the
     given data.
@@ -2881,7 +2861,7 @@ autoplot(org_us_ts) +
   geom_path(colour = "darkgreen")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
 
 -   It is not stationary base on PP-test.
 
@@ -2893,7 +2873,7 @@ PP.test(org_us_ts)
     ##  Phillips-Perron Unit Root Test
     ## 
     ## data:  org_us_ts
-    ## Dickey-Fuller = -2.5455, Truncation lag parameter = 4, p-value = 0.3486
+    ## Dickey-Fuller = -10.954, Truncation lag parameter = 4, p-value = 0.01
 
 ``` r
 # Not stationary
@@ -2909,7 +2889,7 @@ summary(wo(org_us_ts))
     ## Test used:  WO 
     ##  
     ## Test statistic:  0 
-    ## P-value:  1 1 0.7244975 
+    ## P-value:  1 1 0.5805922 
     ##  
     ## The WO - test does not identify  seasonality
 
@@ -2926,7 +2906,7 @@ ggsubseriesplot(org_us_ts) +
   annotate("rect", xmin = 34, xmax = 43, ymin = -Inf, ymax = Inf, fill = "yellow", alpha = 0.1)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-49-1.png)<!-- --> Hopefully,
+![](avocado_files/figure-gfm/unnamed-chunk-50-1.png)<!-- --> Hopefully,
 auto ARIMA should pick up the trend and seasonality and give a suitable
 model without autocorrelation.
 
@@ -2946,15 +2926,15 @@ P-value less than 0.05.
 checkresiduals(org_us_ts_arima)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
 
     ## 
     ##  Ljung-Box test
     ## 
-    ## data:  Residuals from ARIMA(1,1,3)(0,1,0)[52]
-    ## Q* = 100.59, df = 30, p-value = 1.497e-09
+    ## data:  Residuals from ARIMA(2,1,1)
+    ## Q* = 29.162, df = 31, p-value = 0.5608
     ## 
-    ## Model df: 4.   Total lags used: 34
+    ## Model df: 3.   Total lags used: 34
 
 Declaring in the forecast of the existence of autocorrelation during
 ACF-Lag test.
@@ -2968,7 +2948,7 @@ autoplot(org_us_ts_arima_fc) +
   geom_hline(yintercept = 2, linetype = 2, colour = "blue")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
 
 #### 8.3 Forecast: Non-organic Avocado prices in Houston
 
@@ -3000,7 +2980,7 @@ autoplot(conv_houston_ts) +
   geom_path(colour = "brown")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
 
 I have a p-value from stationary test showing a result of higher than
 0.05, and the test says the graph is not stationary.
@@ -3013,8 +2993,7 @@ PP.test(conv_houston_ts)
     ##  Phillips-Perron Unit Root Test
     ## 
     ## data:  conv_houston_ts
-    ## Dickey-Fuller = -3.2503, Truncation lag parameter = 4, p-value =
-    ## 0.08177
+    ## Dickey-Fuller = -10.809, Truncation lag parameter = 4, p-value = 0.01
 
 There are too much noises in the graph, and the seasonality tests does
 not identify seasonality in the graph.
@@ -3026,7 +3005,7 @@ summary(wo(conv_houston_ts))
     ## Test used:  WO 
     ##  
     ## Test statistic:  0 
-    ## P-value:  1 1 0.05514139 
+    ## P-value:  1 1 0.4252686 
     ##  
     ## The WO - test does not identify  seasonality
 
@@ -3049,15 +3028,15 @@ proceed with forecasting.
 checkresiduals(conv_houston_ts_arima)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-57-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
 
     ## 
     ##  Ljung-Box test
     ## 
-    ## data:  Residuals from ARIMA(0,1,0)(0,0,1)[52]
-    ## Q* = 31.227, df = 33, p-value = 0.5556
+    ## data:  Residuals from ARIMA(5,1,0)
+    ## Q* = 31.981, df = 29, p-value = 0.3207
     ## 
-    ## Model df: 1.   Total lags used: 34
+    ## Model df: 5.   Total lags used: 34
 
 Creating the forecast of non-organic avocado in the Houston for next 2
 years.
@@ -3070,7 +3049,7 @@ autoplot(conv_houston_ts_arima_fc) + labs(subtitle = "Prediction of weekly price
   geom_hline(yintercept = 2, linetype = 2, colour = "blue")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
 
 The accuracy of this forecast is 92.97% (1 - MAPE)
 
@@ -3079,21 +3058,21 @@ summary(conv_houston_ts_arima)
 ```
 
     ## Series: conv_houston_ts 
-    ## ARIMA(0,1,0)(0,0,1)[52] 
+    ## ARIMA(5,1,0) 
     ## 
     ## Coefficients:
-    ##         sma1
-    ##       0.1864
-    ## s.e.  0.0965
+    ##           ar1      ar2      ar3      ar4      ar5
+    ##       -0.9878  -0.8015  -0.4057  -0.1699  -0.1919
+    ## s.e.   0.0771   0.1092   0.1222   0.1106   0.0806
     ## 
-    ## sigma^2 estimated as 0.006018:  log likelihood=190.7
-    ## AIC=-377.39   AICc=-377.32   BIC=-371.15
+    ## sigma^2 estimated as 0.01516:  log likelihood=115.33
+    ## AIC=-218.67   AICc=-218.14   BIC=-199.92
     ## 
     ## Training set error measures:
-    ##                        ME       RMSE        MAE        MPE     MAPE      MASE
-    ## Training set -0.001014761 0.07711343 0.05503131 -0.6660946 7.025728 0.4368157
-    ##                     ACF1
-    ## Training set -0.04668654
+    ##                       ME      RMSE        MAE        MPE     MAPE      MASE
+    ## Training set 0.006028976 0.1209043 0.08987347 -0.9391502 10.89647 0.5742871
+    ##                    ACF1
+    ## Training set 0.01864214
 
 -   The plot shows the 95% confidence interval (darker blue area) in the
     forecast zone does not exceed $2 for the next 2 years after 2018.  
@@ -3132,7 +3111,7 @@ autoplot(org_houston_ts) +
   geom_path(colour = "darkgreen")
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
 
 From the first year of our data, organic price of avocado in the first 6
 months of 2015 was relatively constant, however, the price fluctuated
@@ -3149,7 +3128,7 @@ PP.test(org_houston_ts)
     ##  Phillips-Perron Unit Root Test
     ## 
     ## data:  org_houston_ts
-    ## Dickey-Fuller = -2.8269, Truncation lag parameter = 4, p-value = 0.2311
+    ## Dickey-Fuller = -14.966, Truncation lag parameter = 4, p-value = 0.01
 
 There is no indication of seasonality from its P-value.
 
@@ -3160,7 +3139,7 @@ summary(wo(org_houston_ts))
     ## Test used:  WO 
     ##  
     ## Test statistic:  0 
-    ## P-value:  1 1 0.7900466 
+    ## P-value:  1 1 0.7775016 
     ##  
     ## The WO - test does not identify  seasonality
 
@@ -3198,15 +3177,15 @@ There is a normal distribution of residuals as well.
 checkresiduals(org_houston_ts_arima)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-66-1.png)<!-- -->
 
     ## 
     ##  Ljung-Box test
     ## 
-    ## data:  Residuals from ARIMA(0,1,2)
-    ## Q* = 31.381, df = 32, p-value = 0.4977
+    ## data:  Residuals from ARIMA(2,1,3)
+    ## Q* = 37.705, df = 29, p-value = 0.129
     ## 
-    ## Model df: 2.   Total lags used: 34
+    ## Model df: 5.   Total lags used: 34
 
 Testing Ljung-Box test, p-value is greater than 0.05, then I safely say
 no autocorrelation is present. I can safely use this model for the
@@ -3220,7 +3199,7 @@ Box.test(org_houston_ts_arima$residuals, lag = 52, type = "Ljung-Box")
     ##  Box-Ljung test
     ## 
     ## data:  org_houston_ts_arima$residuals
-    ## X-squared = 42.259, df = 52, p-value = 0.8304
+    ## X-squared = 48.73, df = 52, p-value = 0.6033
 
 Synthesising the forecast graph.
 
@@ -3235,7 +3214,7 @@ autoplot(org_houston_ts_arima_fc, h = 104) +
   geom_text(x = 2.5, y = 2019)
 ```
 
-![](avocado_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
+![](avocado_files/figure-gfm/unnamed-chunk-68-1.png)<!-- -->
 
 This model has nearly 95% (94.9515) of accuracy (100 - MAPE).
 
@@ -3244,21 +3223,21 @@ summary(org_houston_ts_arima)   # or accuracy(organic_AA)
 ```
 
     ## Series: org_houston_ts 
-    ## ARIMA(0,1,2) 
+    ## ARIMA(2,1,3) 
     ## 
     ## Coefficients:
-    ##          ma1      ma2
-    ##       0.1212  -0.2221
-    ## s.e.  0.0789   0.0830
+    ##           ar1      ar2      ma1     ma2      ma3
+    ##       -0.9409  -0.9199  -0.1651  0.0665  -0.6362
+    ## s.e.   0.0579   0.0623   0.0944  0.0977   0.1033
     ## 
-    ## sigma^2 estimated as 0.01007:  log likelihood=148.8
-    ## AIC=-291.61   AICc=-291.46   BIC=-282.24
+    ## sigma^2 estimated as 0.04649:  log likelihood=20.42
+    ## AIC=-28.84   AICc=-28.32   BIC=-10.09
     ## 
     ## Training set error measures:
-    ##                        ME       RMSE       MAE       MPE     MAPE      MASE
-    ## Training set 0.0007205485 0.09945763 0.0629353 -0.301139 5.048496 0.1932152
+    ##                       ME      RMSE       MAE       MPE     MAPE      MASE
+    ## Training set 0.003555458 0.2117593 0.1593932 -2.563866 13.39237 0.5766545
     ##                    ACF1
-    ## Training set 0.01370076
+    ## Training set -0.1337459
 
 Bad news is that after 2019, price per organic avocado may exceed $2.
 And I might switch to non-organic avocado.

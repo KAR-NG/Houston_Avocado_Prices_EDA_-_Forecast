@@ -5,7 +5,9 @@
 18k obs & 14 vars cleaned and manipulated for EDA, assumption tests, PP test, WO test, Ljung-box test, and forecasting (ETS & ARIMA) for avocado prices in the US and Houston.
 
 ---
-![thumbnail1](https://user-images.githubusercontent.com/81752452/133361835-45c64527-5fa2-4f0b-94f6-cbe5181025bd.png)
+![thumbnail1](https://user-images.githubusercontent.com/81752452/135016166-6a4ab463-d91d-486c-8d4d-a650333eab43.png)
+
+
 
 
 ---

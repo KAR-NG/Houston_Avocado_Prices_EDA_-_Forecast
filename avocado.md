@@ -2649,7 +2649,7 @@ Xlarge\_bags
 
 It is an interactive PowerBI dashboard hosted locally.
 
-![](https://raw.githubusercontent.com/KAR-NG/Houston_Avocado_Prices_EDA_-_Forecast/main/pic5_powerbi.JP)
+![](https://raw.githubusercontent.com/KAR-NG/Houston_Avocado_Prices_EDA_-_Forecast/main/pic5_powerbi.JPG)
 
 It can be deployed to the server and smartphone app only if I am working
 for you and using your work email address. It is a restriction of this

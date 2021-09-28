@@ -59,7 +59,7 @@ Kar Ng
 ------------------------------------------------------------------------
 
 ![Photo by Russell
-2020](https://raw.githubusercontent.com/KAR-NG/avocado/main/thumbnail1.png)
+2020](https://raw.githubusercontent.com/KAR-NG/Houston_Avocado_Prices_EDA_-_Forecast/main/thumbnail1.png)
 
 ------------------------------------------------------------------------
 
